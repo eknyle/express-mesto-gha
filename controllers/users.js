@@ -17,9 +17,13 @@ module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.name==="ValidationError"){
+      if (err.name==="UserNotFound"){
         res.status(404).send({message: `Переданы некорректные данные ${err}`});
-      }else{
+      }
+      if (err.name==="ValidationError"){
+        res.status(400).send({message: `Переданы некорректные данные ${err}`});
+      }
+      else{
         res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
       }
     });
