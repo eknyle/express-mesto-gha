@@ -1,10 +1,13 @@
 const User = require("../models/user");
 
-class UserNotFound extends Error({
-  message: 'Пользователь не найден',
-  name: 'UserNotFound',
-  statusCode: 404
-}) {}
+class UserNotFound extends Error{
+  constructor(status=500,message='Internal Server Error'){
+    super();
+    this.message= 'Пользователь не найден';
+    this.name= 'UserNotFound';
+    this.status= 404;
+  }
+}
 
 
 
