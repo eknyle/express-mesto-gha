@@ -66,7 +66,7 @@ module.exports.createUser = (req, res) => {
 module.exports.updateUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about, avatar }, { new: true }, { runValidators: true })
+  User.findByIdAndUpdate(req.user._id, { name, about, avatar }, { new: true })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name === "ValidationError") {

@@ -6,6 +6,7 @@ const bodyParser = require("body-parser");
 const { PORT = 3000 } = process.env;
 const app = express();
 
+mongoose.set('runValidators', true);
 mongoose
   .connect("mongodb://localhost:27017/mestodb")
   .then(console.log("Connected to the server"))
