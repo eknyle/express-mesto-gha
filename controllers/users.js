@@ -15,7 +15,7 @@ module.exports.getAllUsers = (req, res) => {
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name==="ValidationError"){
         res.status(400).send({message: `Переданы некорректные данные ${err}`});
@@ -29,7 +29,7 @@ module.exports.createUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.create({ name, about, avatar })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name==="ValidationError"){
         res.status(400).send({message: `Переданы некорректные данные ${err}`});
@@ -43,7 +43,7 @@ module.exports.updateUser = (req, res) => {
   const { name, about, avatar } = req.body;
 
   User.findByIdAndUpdate(req.user._id, { name, about, avatar }, { new: true })
-    .then((user) => res.status(200).send(user))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err.name==="ValidationError"){
         res.status(400).send({message: `Переданы некорректные данные ${err}`});
