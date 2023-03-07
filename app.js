@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 
 const { PORT = 3000 } = process.env;
-
 const app = express();
 
 mongoose
@@ -15,8 +14,6 @@ mongoose
 app.get("/", (req, res) => {
   res.send("hello");
 });
-
-//
 
 app.use(express.static(path.join(__dirname, "public")));
 app.use(bodyParser.json());
@@ -31,9 +28,6 @@ app.use((req, res, next) => {
 
 app.use("/cards", require("./routes/cards"));
 app.use("/users", require("./routes/users"));
-
-
-
 app.listen(PORT, function () {
   console.log("now listening  on http://localhost:3000/");
 });

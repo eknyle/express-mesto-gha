@@ -5,7 +5,13 @@ module.exports.getCards = (req, res) => {
   Card.find({})
     .populate("owner")
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name==="ValidationError"){
+        res.status(400).send({message: `Переданы некорректные данные ${err}`});
+      }else{
+        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+      }
+    });
 };
 
 module.exports.createCard = (req, res) => {
@@ -13,13 +19,26 @@ module.exports.createCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(200).send({ data: card }))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name==="ValidationError"){
+        res.status(400).send({message: `Переданы некорректные данные ${err}`});
+      }else{
+        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+      }
+
+    });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => res.status(200).send({ data: card }))
-    .catch(err => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      if (err.name==="ValidationError"){
+        res.status(400).send({message: `Переданы некорректные данные ${err}`});
+      }else{
+        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+      }
+    });
 };
 
 module.exports.likeCard = (req, res) => {
@@ -29,7 +48,13 @@ module.exports.likeCard = (req, res) => {
     { new: true }
   )
   .then((card) => res.status(200).send({ data: card }))
-  .catch(err => res.status(500).send({ message: err.message }));
+  .catch((err) => {
+    if (err.name==="ValidationError"){
+      res.status(400).send({message: `Переданы некорректные данные ${err}`});
+    }else{
+      res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+    }
+  });
 };
 
 module.exports.dislikeCard = (req, res) => {
@@ -39,5 +64,11 @@ module.exports.dislikeCard = (req, res) => {
     { new: true }
   )
   .then((card) => res.status(200).send({ data: card }))
-  .catch(err => res.status(500).send({ message: err.message }));
+  .catch((err) => {
+    if (err.name==="ValidationError"){
+      res.status(400).send({message: `Переданы некорректные данные ${err}`});
+    }else{
+      res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+    }
+  });
 };
