@@ -1,5 +1,13 @@
 const User = require("../models/user");
 
+class UserNotFound extends Error({
+  message: 'Пользователь не найден',
+  name: 'UserNotFound',
+  statusCode: 404
+}) {}
+
+
+
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
@@ -17,15 +25,14 @@ module.exports.getAllUsers = (req, res) => {
 module.exports.getUser = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => {
-      throw new Error({name: "UserNotFound"});
+      throw new UserNotFound();
     })
     .then((user) => res.status(200).send({ data: user }))
-
     .catch((err) => {
       if (err.name === "UserNotFound") {
         res
           .status(404)
-          .send({ message: `Переданы некорректные данные ${err}` });
+          .send({ message: `Пользователь не найден ${err}` });
       }
       if (err.name === "ValidationError") {
         res
