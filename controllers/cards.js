@@ -1,6 +1,6 @@
 const Card = require("../models/card");
 class CardNotFound extends Error{
-  constructor(status=500,message='Internal Server Error'){
+  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
     super();
     this.message= 'Карточка не найдена';
     this.name= 'CardNotFound';
@@ -8,7 +8,7 @@ class CardNotFound extends Error{
   }
 }
 class ValidationError extends Error{
-  constructor(status=500,message='Internal Server Error'){
+  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
     super();
     this.message= 'Переданы некорректные данные';
     this.name= 'ValidationError';

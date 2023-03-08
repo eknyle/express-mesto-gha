@@ -1,7 +1,7 @@
 const User = require("../models/user");
 
 class UserNotFound extends Error{
-  constructor(status=500,message='Internal Server Error'){
+  constructor(status=500,message='Internal Server Error',name='InternalServerError'){
     super();
     this.message= 'Пользователь не найден';
     this.name= 'UserNotFound';
@@ -9,7 +9,7 @@ class UserNotFound extends Error{
   }
 }
 class ValidationError extends Error{
-  constructor(status=500,message='Internal Server Error'){
+  constructor(status=500,message='Internal Server Error',name='InternalServerError'){
     super();
     this.message= 'Переданы некорректные данные';
     this.name= 'ValidationError';
