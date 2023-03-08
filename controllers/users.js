@@ -8,6 +8,19 @@ class UserNotFound extends Error{
     this.status= 404;
   }
 }
+class ValidationError extends Error{
+  constructor(status=500,message='Internal Server Error'){
+    super();
+    this.message= 'Переданы некорректные данные';
+    this.name= 'ValidationError';
+    this.status= 400;
+  }
+}
+class InternalServerError extends Error{
+  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
+    super();
+  }
+}
 
 
 
@@ -17,10 +30,10 @@ module.exports.getAllUsers = (req, res) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         res
-          .status(400)
-          .send({ message: `Переданы некорректные данные ${err}` });
+          .status(ValidationError.status)
+          .send({ message: `${ValidationError.message} ${err}` });
       } else {
-        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
       }
     });
 };
@@ -34,15 +47,15 @@ module.exports.getUser = (req, res) => {
     .catch((err) => {
       if (err.name === "UserNotFound") {
         res
-          .status(404)
-          .send({ message: `Пользователь не найден` });
+          .status(err.status)
+          .send({ message: err.message});
       }
       if (err.name === "ValidationError") {
         res
-          .status(400)
-          .send({ message: `Переданы некорректные данные ${err}` });
+        .status(ValidationError.status)
+        .send({ message: `${ValidationError.message} ${err}` });
       } else {
-        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
       }
     });
 };
@@ -55,10 +68,10 @@ module.exports.createUser = (req, res) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         res
-          .status(400)
-          .send({ message: `Переданы некорректные данные ${err}` });
+        .status(ValidationError.status)
+        .send({ message: `${ValidationError.message} ${err}` });
       } else {
-        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
       }
     });
 };
@@ -71,10 +84,10 @@ module.exports.updateUser = (req, res) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         res
-          .status(400)
-          .send({ message: `Переданы некорректные данные ${err}` });
+        .status(ValidationError.status)
+        .send({ message: `${ValidationError.message} ${err}` });
       } else {
-        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
       }
     });
 };
@@ -86,10 +99,10 @@ module.exports.updateAvatar = (req, res) => {
     .catch((err) => {
       if (err.name === "ValidationError") {
         res
-          .status(400)
-          .send({ message: `Переданы некорректные данные ${err}` });
+        .status(ValidationError.status)
+        .send({ message: `${ValidationError.message} ${err}` });
       } else {
-        res.status(500).send({ message: `Внутренняя ошибка сервера ${err}` });
+        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
       }
     });
 };
