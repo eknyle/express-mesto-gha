@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const { PORT = 3000 } = process.env;
 const app = express();
 
+const PAGE_NOT_FOUND_MESSAGE = 'Страница по указанному маршруту не найдена';
+
 mongoose
   .connect('mongodb://localhost:27017/mestodb')
   .then(console.log('Connected to the server'))
@@ -25,6 +27,6 @@ app.use('/cards', require('./routes/cards'));
 
 app.use('/users', require('./routes/users'));
 
-app.use((req, res) => { res.status(404).send({ message: 'Страница по указанному маршруту не найдена' }); });
+app.use((req, res) => { res.status(404).send({ message: PAGE_NOT_FOUND_MESSAGE }); });
 
 app.listen(PORT, () => { console.log('now listening  on http://localhost:3000/'); });

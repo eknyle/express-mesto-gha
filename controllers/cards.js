@@ -21,10 +21,9 @@ const SERVER_ERROR_CODE = 500;
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .populate('owner')
-    .populate('likes')
+    .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` }));
+    .catch((err) => res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` }));
 };
 
 module.exports.createCard = (req, res) => {
@@ -36,9 +35,9 @@ module.exports.createCard = (req, res) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return res
           .status(VALIDATION_ERROR_CODE)
-          .send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
+          .send({ message: `${VALIDATION_ERROR_MESSAGE} ${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
     });
 };
 
@@ -53,9 +52,9 @@ module.exports.deleteCard = (req, res) => {
         return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err}` });
+        return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
     });
 };
 
@@ -74,9 +73,9 @@ module.exports.likeCard = (req, res) => {
         return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err}` });
+        return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
     });
 };
 
@@ -95,8 +94,8 @@ module.exports.dislikeCard = (req, res) => {
         return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err}` });
+        return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
     });
 };
