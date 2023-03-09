@@ -1,81 +1,68 @@
-const Card = require("../models/card");
-class CardNotFound extends Error{
-  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
+const mongoose = require('mongoose');
+const Card = require('../models/card');
+
+class CardNotFound extends Error {
+  constructor() {
     super();
-    this.message= 'Карточка не найдена';
-    this.name= 'CardNotFound';
-    this.status= 404;
-  }
-}
-class ValidationError extends Error{
-  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
-    super();
-    this.message= 'Переданы некорректные данные';
-    this.name= 'ValidationError';
-    this.status= 400;
-  }
-}
-class InternalServerError extends Error{
-  constructor(status=500,message='Внутренняя ошибка сервера',name='InternalServerError'){
-    super();
+    this.message = 'Карточка не найдена';
+    this.name = 'CardNotFound';
+    this.status = 404;
   }
 }
 
+const CAST_ERROR_MESSAGE = 'Передан некорректный ID';
+const CAST_ERROR_CODE = 400;
+
+const VALIDATION_ERROR_MESSAGE = 'Переданы некорректные данные';
+const VALIDATION_ERROR_CODE = 400;
+
+const SERVER_ERROR_MESSAGE = 'Внутренняя ошибка сервера';
+const SERVER_ERROR_CODE = 500;
 
 module.exports.getCards = (req, res) => {
   Card.find({})
-    .populate("owner")
+    .populate('owner')
+    .populate('likes')
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => {
-      if (err.name === "ValidationError") {
-        res
-          .status(ValidationError.status)
-          .send({ message: `${ValidationError.message} ${err}` });
-      } else {
-        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
-      }
-    });
+    .catch((err) => res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` }));
 };
 
 module.exports.createCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err instanceof mongoose.Error.ValidationError) {
         res
-          .status(ValidationError.status)
-          .send({ message: `${ValidationError.message} ${err}` });
-      }
-      if (~err.name.indexOf('NotFound')>=0){
+          .status(VALIDATION_ERROR_CODE)
+          .send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
+      } else {
         res
-        .status(CardNotFound.status)
-        .send({ message: `${CardNotFound.message} ${err}` });
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
       }
-      else {
-        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
-      }
-
     });
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(() => {
+      throw new CardNotFound();
+    })
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
-        res
-          .status(ValidationError.status)
-          .send({ message: `${ValidationError.message} ${err}` });
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
-      if (~err.name.indexOf('NotFound')>=0){
+      if (err instanceof CardNotFound) {
         res
-        .status(CardNotFound.status)
-        .send({ message: `${CardNotFound.message} ${err}` });
-      }
-      else {
-        res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
+          .status(CardNotFound.status)
+          .send({ message: `${CardNotFound.message} ${err}` });
+      } else {
+        res
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
       }
     });
 };
@@ -83,47 +70,51 @@ module.exports.deleteCard = (req, res) => {
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true }
+    { $addToSet: { likes: req.user._id } },
+    { new: true, runValidators: true },
   )
-  .then((card) => res.status(200).send({ data: card }))
-  .catch((err) => {
-    if (err.name === "ValidationError") {
-      res
-        .status(ValidationError.status)
-        .send({ message: `${ValidationError.message} ${err}` });
-    }
-    if (~err.name.indexOf('NotFound')>=0){
-      res
-      .status(CardNotFound.status)
-      .send({ message: `${CardNotFound.message} ${err}` });
-    }
-    else {
-      res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
-    }
-  });
+    .orFail(() => {
+      throw new CardNotFound();
+    })
+    .then((card) => res.status(200).send({ data: card }))
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+      }
+      if (err instanceof CardNotFound) {
+        res
+          .status(CardNotFound.status)
+          .send({ message: `${CardNotFound.message} ${err}` });
+      } else {
+        res
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      }
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true, runValidators: true },
   )
-  .then((card) => res.status(200).send({ data: card }))
-  .catch((err) => {
-    if (err.name === "ValidationError") {
-      res
-        .status(ValidationError.status)
-        .send({ message: `${ValidationError.message} ${err}` });
-    }
-    if (~err.name.indexOf('NotFound')>=0){
-      res
-      .status(CardNotFound.status)
-      .send({ message: `${CardNotFound.message} ${err}` });
-    }
-    else {
-      res.status(InternalServerError.status).send({ message: `${InternalServerError.message} ${err}` });
-    }
-  });
+    .orFail(() => {
+      throw new CardNotFound();
+    })
+    .then((card) => res.status(200).send({ data: card }))
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+      }
+      if (err instanceof CardNotFound) {
+        res
+          .status(CardNotFound.status)
+          .send({ message: `${CardNotFound.message} ${err}` });
+      } else {
+        res
+          .status(SERVER_ERROR_CODE)
+          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+      }
+    });
 };
