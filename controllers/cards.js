@@ -34,14 +34,11 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.status(201).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        res
+        return res
           .status(VALIDATION_ERROR_CODE)
           .send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
-      } else {
-        res
-          .status(SERVER_ERROR_CODE)
-          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
 
@@ -53,17 +50,12 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        res
-          .status(CardNotFound.status)
-          .send({ message: `${CardNotFound.message} ${err}` });
-      } else {
-        res
-          .status(SERVER_ERROR_CODE)
-          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(err.status).send({ message: `${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
 
@@ -79,17 +71,12 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        res
-          .status(CardNotFound.status)
-          .send({ message: `${CardNotFound.message} ${err}` });
-      } else {
-        res
-          .status(SERVER_ERROR_CODE)
-          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(err.status).send({ message: `${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
 
@@ -105,16 +92,11 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
-        res
-          .status(CardNotFound.status)
-          .send({ message: `${CardNotFound.message} ${err}` });
-      } else {
-        res
-          .status(SERVER_ERROR_CODE)
-          .send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(err.status).send({ message: `${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };

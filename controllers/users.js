@@ -33,13 +33,12 @@ module.exports.getUser = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof UserNotFound) {
-        res.status(err.status).send({ message: err.message });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(err.status).send({ message: err.message });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
 
@@ -67,16 +66,15 @@ module.exports.updateUser = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof UserNotFound) {
-        res.status(err.status).send({ message: err.message });
+        return res.status(err.status).send({ message: err.message });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(VALIDATION_ERROR_CODE).send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(VALIDATION_ERROR_CODE).send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
 module.exports.updateAvatar = (req, res) => {
@@ -89,15 +87,14 @@ module.exports.updateAvatar = (req, res) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
       }
       if (err instanceof UserNotFound) {
-        res.status(err.status).send({ message: err.message });
+        return res.status(err.status).send({ message: err.message });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        res.status(VALIDATION_ERROR_CODE).send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
-      } else {
-        res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
+        return res.status(VALIDATION_ERROR_CODE).send({ message: `${VALIDATION_ERROR_MESSAGE} ${err}` });
       }
+      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err}` });
     });
 };
