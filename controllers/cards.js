@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
+const errors = require('../errors/error-codes');
 
 class CardNotFound extends Error {
   constructor() {
@@ -10,23 +11,15 @@ class CardNotFound extends Error {
   }
 }
 
-const CAST_ERROR_MESSAGE = 'Передан некорректный ID';
-const CAST_ERROR_CODE = 400;
 
-const VALIDATION_ERROR_MESSAGE = 'Переданы некорректные данные';
-const VALIDATION_ERROR_CODE = 400;
-
-const SERVER_ERROR_MESSAGE = 'Внутренняя ошибка сервера';
-const SERVER_ERROR_CODE = 500;
-
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
     .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` }));
+    .catch((err) => next(err));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
@@ -34,14 +27,14 @@ module.exports.createCard = (req, res) => {
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         return res
-          .status(VALIDATION_ERROR_CODE)
-          .send({ message: `${VALIDATION_ERROR_MESSAGE} ${err.message}` });
+          .status(errors.VALIDATION_ERROR_CODE)
+          .send({ message: `${errors.VALIDATION_ERROR_MESSAGE} ${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
+      return next(err);
     });
 };
 
-module.exports.deleteCard = (req, res) => {
+module.exports.deleteCard = (req, res, next) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
       throw new CardNotFound();
@@ -49,16 +42,16 @@ module.exports.deleteCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
         return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
+      return next(err);
     });
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -70,16 +63,16 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
         return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
+      return next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -91,11 +84,11 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(CAST_ERROR_CODE).send({ CAST_ERROR_MESSAGE });
+        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
         return res.status(err.status).send({ message: `${err.message}` });
       }
-      return res.status(SERVER_ERROR_CODE).send({ message: `${SERVER_ERROR_MESSAGE} ${err.message}` });
+      return next(err);
     });
 };
