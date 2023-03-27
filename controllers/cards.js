@@ -33,7 +33,7 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (card.owner._id === req.user._id) {
-        Card.findByIdAndRemove(card._id);
+        Card.findByIdAndRemove(req.params.cardId);
       } else {
         throw new ForbiddenError();
       }
@@ -43,6 +43,9 @@ module.exports.deleteCard = (req, res, next) => {
         return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
       }
       if (err instanceof CardNotFound) {
+        return res.status(err.status).send({ message: `${err.message}` });
+      }
+      if (err instanceof ForbiddenError) {
         return res.status(err.status).send({ message: `${err.message}` });
       }
       return next(err);
