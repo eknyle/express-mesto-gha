@@ -1,16 +1,8 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 const errors = require('../errors/error-codes');
-
-class CardNotFound extends Error {
-  constructor() {
-    super();
-    this.message = 'Карточка не найдена';
-    this.name = 'CardNotFound';
-    this.status = 404;
-  }
-}
-
+const ForbiddenError = require('../errors/forbidden-error');
+const CardNotFound = require('../errors/card-not-found-error');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -35,11 +27,17 @@ module.exports.createCard = (req, res, next) => {
 };
 
 module.exports.deleteCard = (req, res, next) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.id)
     .orFail(() => {
       throw new CardNotFound();
     })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => {
+      if (card.owner._id === req.user._id) {
+        Card.findByIdAndRemove(card._id);
+      } else {
+        throw new ForbiddenError();
+      }
+    })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });

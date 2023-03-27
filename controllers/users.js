@@ -33,7 +33,6 @@ module.exports.getAllUsers = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res) => {
-  console.log(req.params);
   User.findById(req.params.id)
     .orFail(() => {
       throw new UserNotFound();
