@@ -4,6 +4,7 @@ class UserNotFound extends Error {
     this.message = 'Пользователь не найден';
     this.name = 'UserNotFound';
     this.status = 404;
+    this.statusCode = 404;
   }
 }
 

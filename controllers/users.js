@@ -32,7 +32,27 @@ module.exports.getAllUsers = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-module.exports.getUser = (req, res, next) => {
+module.exports.getUser = (req, res) => {
+  console.log(req.params);
+  User.findById(req.params.id)
+    .orFail(() => {
+      throw new UserNotFound();
+    })
+    .then((user) => res.status(200).send({ data: user }))
+    .catch((err) => {
+      if (err instanceof mongoose.Error.CastError) {
+        err.statusCode = errors.CAST_ERROR_CODE;
+        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+      }
+      if (err instanceof UserNotFound) {
+        return res.status(err.status).send({ message: err.message });
+      }
+
+      return next(err);
+    });
+};
+
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
       throw new UserNotFound();
@@ -61,6 +81,7 @@ module.exports.login = (req, res, next) => {
       res.send({ token });
     })
     .catch((err) => {
+      err.statusCode = errors.UNAUTHORIZED_ERROR_CODE;
       res
         .status(errors.UNAUTHORIZED_ERROR_CODE)
         .send({ message: `${errors.UNAUTHORIZED_ERROR_MESSAGE} ${err.message}` });

@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
-//app.use((req, res) => { res.status(404).send({ message: PAGE_NOT_FOUND_MESSAGE }); });
+app.use((req, res) => { res.status(404).send({ message: PAGE_NOT_FOUND_MESSAGE }); });
 app.use(errorHandler);
 
 app.listen(PORT, () => { console.log('now listening  on http://localhost:3000/'); });
