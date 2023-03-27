@@ -7,6 +7,7 @@ module.exports = (req, res, next) => {
 
   // убеждаемся, что он есть или начинается с Bearer
   if (!authorization || !authorization.startsWith('Bearer ')) {
+    console.log('authorization'+errors.UNAUTHORIZED_ERROR_CODE+' '+errors.UNAUTHORIZED_ERROR_MESSAGE );
     return res
       .status(errors.UNAUTHORIZED_ERROR_CODE)
       .send({ message: errors.UNAUTHORIZED_ERROR_MESSAGE });
