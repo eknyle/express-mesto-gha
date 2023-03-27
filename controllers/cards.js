@@ -31,9 +31,22 @@ module.exports.deleteCard = (req, res, next) => {
     .orFail(() => {
       throw new CardNotFound();
     })
-    .then((card) => {
-      if (card.owner._id === req.user._id) {
-        Card.findByIdAndRemove(req.params.cardId);
+    .then((card_) => {
+      if (card_.owner._id.toString() === req.user._id) {
+          Card.findByIdAndRemove(req.params.cardId)
+          .orFail(() => {
+            throw new CardNotFound();
+          })
+          .then((card) => res.status(200).send({ data: card }))
+          .catch((err) => {
+            if (err instanceof mongoose.Error.CastError) {
+              return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+            }
+            if (err instanceof CardNotFound) {
+              return res.status(err.status).send({ message: `${err.message}` });
+            }
+            return next(err);
+          });
       } else {
         throw new ForbiddenError();
       }
