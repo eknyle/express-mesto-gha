@@ -4,8 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const UserNotFound = require('../errors/user-not-found-error');
 const errors = require('../errors/error-codes');
-const { celebrate, Joi } = require('celebrate');
-
+//const { celebrate, Joi } = require('celebrate');
 //29ea2afd00fdec957d31555f5aa99601b10fd99c29928f242328168a78eae737
 
 /* router.delete('/:postId', celebrate({
@@ -21,14 +20,11 @@ const { celebrate, Joi } = require('celebrate');
   }),
 }), deletePost);
 
-
 router.delete('/:postId', celebrate({
   headers: Joi.object().keys({
     // валидируем заголовки
   }).unknown(true),
 }), deletePost);
-
-
  */
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
@@ -37,9 +33,7 @@ module.exports.getAllUsers = (req, res, next) => {
 };
 
 module.exports.getUser = (req, res, next) => {
-
-  const { id } = req.body;
-  User.findById(id)
+  User.findById(req.user._id)
     .orFail(() => {
       throw new UserNotFound();
     })
@@ -76,11 +70,15 @@ module.exports.login = (req, res, next) => {
 
 // исправить возвращаемый объект!! без хэша надо
 module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
   bcrypt.hash(password, 10)
     .then((hash) => {
-      User.create({ name, about, avatar, email, password: hash });
+      User.create({
+        name, about, avatar, email, password: hash,
+      });
     })
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
@@ -88,7 +86,7 @@ module.exports.createUser = (req, res, next) => {
         res.status(errors.VALIDATION_ERROR_CODE).send({ message: `${errors.VALIDATION_ERROR_MESSAGE} ${err.message}` });
       }
 
-      if (err.code === 11000){
+      if (err.code === 11000) {
         res.status(errors.DUPLICATE_ERROR_CODE).send({ message: `${errors.DUPLICATE_ERROR_MESSAGE} ${err.message}` });
       } else {
         next(err);
