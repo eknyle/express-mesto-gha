@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-
+const VALIDATION_ERROR_MESSAGE = 'Переданы некорректные данные';
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -10,6 +10,12 @@ const cardSchema = new mongoose.Schema({
   link: {
     type: String,
     required: true,
+    validate: {
+      validator(v) {
+        return /https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]{1,256}\.[a-zA-Zа-яА-Я]{1,6}#?/gi.test(v);
+      },
+      message: `${VALIDATION_ERROR_MESSAGE}`,
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
