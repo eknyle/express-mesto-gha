@@ -75,14 +75,13 @@ module.exports.createUser = (req, res, next) => {
   } = req.body;
 
   bcrypt.hash(password, 10)
-    .then((hash) => {
-      User.create({
-        name, about, avatar, email, password: hash,
-      });
-    })
+    .then((hash) => User.create({
+      name, about, avatar, email, password: hash,
+    }))
     .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
+        err.statusCode = errors.VALIDATION_ERROR_CODE;
         res.status(errors.VALIDATION_ERROR_CODE).send({ message: `${errors.VALIDATION_ERROR_MESSAGE} ${err.message}` });
       }
 
