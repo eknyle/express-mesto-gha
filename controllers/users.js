@@ -11,7 +11,7 @@ module.exports.getAllUsers = (req, res, next) => {
     .catch((err) => next(err));
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res,next) => {
   User.findById(req.params.id)
     .orFail(() => {
       throw new UserNotFound();
