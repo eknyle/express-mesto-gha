@@ -5,27 +5,6 @@ const User = require('../models/user');
 const UserNotFound = require('../errors/user-not-found-error');
 const errors = require('../errors/error-codes');
 
-//29ea2afd00fdec957d31555f5aa99601b10fd99c29928f242328168a78eae737
-
-/* router.delete('/:postId', celebrate({
-  // валидируем параметры
-  params: Joi.object().keys({
-    postId: Joi.string().alphanum().length(24),
-  }),
-  headers: Joi.object().keys({
-    // валидируем заголовки
-  }),
-  query: Joi.object().keys({
-    // валидируем query
-  }),
-}), deletePost);
-
-router.delete('/:postId', celebrate({
-  headers: Joi.object().keys({
-    // валидируем заголовки
-  }).unknown(true),
-}), deletePost);
- */
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
