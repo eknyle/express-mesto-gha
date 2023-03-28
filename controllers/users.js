@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const UserNotFound = require('../errors/user-not-found-error');
 const errors = require('../errors/error-codes');
-//const { celebrate, Joi } = require('celebrate');
+
 //29ea2afd00fdec957d31555f5aa99601b10fd99c29928f242328168a78eae737
 
 /* router.delete('/:postId', celebrate({
@@ -98,10 +98,7 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => {
-      delete user.password;
-      return res.status(201).send({ data: user });
-    })
+    .then((user) => res.status(201).send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
         err.statusCode = errors.VALIDATION_ERROR_CODE;
