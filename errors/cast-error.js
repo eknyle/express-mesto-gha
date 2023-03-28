@@ -4,6 +4,7 @@ class CastError extends Error {
     this.message = `Передан некорректный ID ${addMessage}`;
     this.name = 'CastError';
     this.status = 404;
+    this.statusCode = 404;
   }
 }
 
