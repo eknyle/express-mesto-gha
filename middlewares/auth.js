@@ -7,7 +7,7 @@ module.exports = (req, res, next) => {
 
   // убеждаемся, что он есть или начинается с Bearer
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    next(new UnauthorizedError());
+    return next(new UnauthorizedError());
   }
   // извлечём токен
   const token = authorization.replace('Bearer ', '');
@@ -20,7 +20,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     // отправим ошибку, если не получилось
 
-    next(new UnauthorizedError());
+    return next(new UnauthorizedError());
   }
   req.user = payload; // записываем пейлоуд в объект запроса
 
