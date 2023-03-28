@@ -1,28 +1,27 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
-const errors = require('../errors/error-codes');
 const ForbiddenError = require('../errors/forbidden-error');
 const CardNotFound = require('../errors/card-not-found-error');
+const ValidationError = require('../errors/validation-error');
+const CastError = require('../errors/cast-error');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
     .populate(['owner', 'likes'])
-    .then((cards) => res.status(200).send({ data: cards }))
-    .catch((err) => next(err));
+    .then((cards) => res.send({ data: cards }))
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.status(201).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res
-          .status(errors.VALIDATION_ERROR_CODE)
-          .send({ message: `${errors.VALIDATION_ERROR_MESSAGE} ${err.message}` });
+        next(new ValidationError(err.message));
       }
-      return next(err);
+      next(err);
     });
 };
 
@@ -33,33 +32,33 @@ module.exports.deleteCard = (req, res, next) => {
     })
     .then((card_) => {
       if (card_.owner._id.toString() === req.user._id) {
-          Card.findByIdAndRemove(req.params.cardId)
+        Card.findByIdAndRemove(req.params.cardId)
           .orFail(() => {
             throw new CardNotFound();
           })
           .then((card) => res.status(200).send({ data: card }))
           .catch((err) => {
             if (err instanceof mongoose.Error.CastError) {
-              return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+              next(new CastError(err.message));
             }
             if (err instanceof CardNotFound) {
-              return res.status(err.status).send({ message: `${err.message}` });
+              next(new CardNotFound(err.message));
             }
             return next(err);
           });
       } else {
-        throw new ForbiddenError();
+        next(new ForbiddenError());
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+        next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err.message}` });
+        next(new CardNotFound(err.message));
       }
       if (err instanceof ForbiddenError) {
-        return res.status(err.status).send({ message: `${err.message}` });
+        next(new ForbiddenError(err.message));
       }
       return next(err);
     });
@@ -77,10 +76,10 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+        next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err.message}` });
+        next(new CardNotFound(err.message));
       }
       return next(err);
     });
@@ -98,10 +97,10 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(errors.CAST_ERROR_CODE).send({ message: errors.CAST_ERROR_MESSAGE });
+        next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        return res.status(err.status).send({ message: `${err.message}` });
+        next(new CardNotFound(err.message));
       }
       return next(err);
     });

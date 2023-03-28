@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const errors = require('../errors/error-codes');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
 module.exports = (req, res, next) => {
   // достаём авторизационный заголовок
@@ -7,10 +7,7 @@ module.exports = (req, res, next) => {
 
   // убеждаемся, что он есть или начинается с Bearer
   if (!authorization || !authorization.startsWith('Bearer ')) {
-    console.log('authorization'+errors.UNAUTHORIZED_ERROR_CODE+' '+errors.UNAUTHORIZED_ERROR_MESSAGE );
-    return res
-      .status(errors.UNAUTHORIZED_ERROR_CODE)
-      .send({ message: errors.UNAUTHORIZED_ERROR_MESSAGE });
+    next(new UnauthorizedError());
   }
   // извлечём токен
   const token = authorization.replace('Bearer ', '');
@@ -23,9 +20,7 @@ module.exports = (req, res, next) => {
   } catch (err) {
     // отправим ошибку, если не получилось
 
-    return res
-      .status(errors.UNAUTHORIZED_ERROR_CODE)
-      .send({ message: errors.UNAUTHORIZED_ERROR_MESSAGE });
+    next(new UnauthorizedError());
   }
   req.user = payload; // записываем пейлоуд в объект запроса
 

@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const VALIDATION_ERROR_MESSAGE = 'Переданы некорректные данные';
 const cardSchema = new mongoose.Schema({
   name: {
@@ -12,6 +13,7 @@ const cardSchema = new mongoose.Schema({
     required: true,
     validate: {
       validator(v) {
+        //eslint-disable-next-line
         return /https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]{1,256}\.[a-zA-Zа-яА-Я]{1,6}#?/gi.test(v);
       },
       message: `${VALIDATION_ERROR_MESSAGE}`,

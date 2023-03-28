@@ -11,6 +11,7 @@
   },
   "rules": {
     "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-    "max-classes-per-file": [1, 1]
+    "max-classes-per-file": [1, 1],
+    "import/no-extraneous-dependencies": ["error", {"devDependencies": false, "optionalDependencies": false, "peerDependencies": false}]
   }
 }

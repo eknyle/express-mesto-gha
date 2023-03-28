@@ -1,7 +1,7 @@
 class CardNotFound extends Error {
-  constructor() {
+  constructor({ addMessage = '' }) {
     super();
-    this.message = 'Карточка не найдена';
+    this.message = `Карточка не найдена ${addMessage}`;
     this.name = 'CardNotFound';
     this.status = 404;
   }
