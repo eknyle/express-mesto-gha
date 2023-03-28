@@ -5,6 +5,8 @@ const {
   getAllUsers, getUser, updateUser, updateAvatar, getCurrentUser,
 } = require('../controllers/users');
 
+const pattern = /^https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]{1,256}\.[a-zA-Zа-яА-Я]{1,6}#?$/;
+
 router.get('/', getAllUsers);
 router.get('/:id', celebrate({
   body: Joi.object().keys({
@@ -20,7 +22,7 @@ router.patch('/me', celebrate({
 }), updateUser);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
-    avatar: Joi.string().required().pattern(/https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]{1,256}\.[a-zA-Zа-яА-Я]{1,6}#?/,Joi.boolean()),
+    avatar: Joi.string().required().regex(pattern),
   }),
 }), updateAvatar);
 
