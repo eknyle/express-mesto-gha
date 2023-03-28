@@ -40,15 +40,12 @@ module.exports.deleteCard = (req, res, next) => {
             if (err instanceof mongoose.Error.CastError) {
               return next(new NotFoundError());
             }
-            if (err instanceof NotFoundError) {
-              return next(new NotFoundError());
-            }
-            return next(err);
+            return next();
           });
+
       } else {
         return next(new ForbiddenError());
       }
-      return next();
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
