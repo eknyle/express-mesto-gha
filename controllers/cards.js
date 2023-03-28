@@ -38,7 +38,10 @@ module.exports.deleteCard = (req, res, next) => {
           .then((card) => res.send({ data: card }))
           .catch((err) => {
             if (err instanceof mongoose.Error.CastError) {
-              return next(new NotFoundError(err.message));
+              return next(new NotFoundError());
+            }
+            if (err instanceof NotFoundError) {
+              return next(new NotFoundError());
             }
             return next(err);
           });
