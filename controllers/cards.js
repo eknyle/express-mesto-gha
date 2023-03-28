@@ -42,10 +42,10 @@ module.exports.deleteCard = (req, res, next) => {
             }
             return next();
           });
-
       } else {
         return next(new ForbiddenError());
       }
+      return true;
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
