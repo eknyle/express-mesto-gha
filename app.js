@@ -3,8 +3,10 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
+const { errors } = require('celebrate');
 const errorHandler = require('./errors/error-handler');
 const routes = require('./routes');
+
 
 const { PORT = 3000 } = process.env;
 const app = express();
@@ -24,6 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(routes);
 
+app.use(errors());
 app.use((req, res) => { res.status(404).send({ message: PAGE_NOT_FOUND_MESSAGE }); });
 app.use(errorHandler);
 
