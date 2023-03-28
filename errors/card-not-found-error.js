@@ -1,5 +1,5 @@
 class CardNotFound extends Error {
-  constructor({ addMessage = '' }) {
+  constructor(addMessage = '') {
     super();
     this.message = `Карточка не найдена ${addMessage}`;
     this.name = 'CardNotFound';

@@ -19,9 +19,9 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new ValidationError(err.message));
+        return next(new ValidationError(err.message));
       }
-      next(err);
+      return next(err);
     });
 };
 
@@ -36,29 +36,29 @@ module.exports.deleteCard = (req, res, next) => {
           .orFail(() => {
             throw new CardNotFound();
           })
-          .then((card) => res.status(200).send({ data: card }))
+          .then((card) => res.send({ data: card }))
           .catch((err) => {
             if (err instanceof mongoose.Error.CastError) {
-              next(new CastError(err.message));
+              return next(new CastError(err.message));
             }
             if (err instanceof CardNotFound) {
-              next(new CardNotFound(err.message));
+              return next(new CardNotFound(err.message));
             }
             return next(err);
           });
       } else {
-        next(new ForbiddenError());
+        return next(new ForbiddenError());
       }
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new CastError(err.message));
+        return next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        next(new CardNotFound(err.message));
+        return next(new CardNotFound(err.message));
       }
       if (err instanceof ForbiddenError) {
-        next(new ForbiddenError(err.message));
+        return next(new ForbiddenError(err.message));
       }
       return next(err);
     });
@@ -76,10 +76,10 @@ module.exports.likeCard = (req, res, next) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new CastError(err.message));
+        return next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        next(new CardNotFound(err.message));
+        return next(new CardNotFound(err.message));
       }
       return next(err);
     });
@@ -97,10 +97,10 @@ module.exports.dislikeCard = (req, res, next) => {
     .then((card) => res.status(200).send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new CastError(err.message));
+        return next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        next(new CardNotFound(err.message));
+        return next(new CardNotFound(err.message));
       }
       return next(err);
     });

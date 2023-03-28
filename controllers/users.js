@@ -22,10 +22,10 @@ module.exports.getUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new CastError(err.message));
+        return next(new CastError(err.message));
       }
       if (err instanceof UserNotFound) {
-        next(new UserNotFound(err.message));
+        return next(new UserNotFound(err.message));
       }
 
       return next(err);
@@ -40,10 +40,10 @@ module.exports.getCurrentUser = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        next(new CastError(err.message));
+        return next(new CastError(err.message));
       }
       if (err instanceof UserNotFound) {
-        next(new UserNotFound(err.message));
+        return next(new UserNotFound(err.message));
       }
       return next(err);
     });
@@ -58,9 +58,7 @@ module.exports.login = (req, res, next) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => {
-      next(new UnauthorizedError(err.message));
-    })
+    .catch((err) => next(new UnauthorizedError(err.message)))
     .catch(next);
 };
 
@@ -77,13 +75,12 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send({ data: user.toJSON() }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new ValidationError(err.message));
+        return next(new ValidationError(err.message));
       }
       if (err.code === 11000) {
-        next(new DuplicateError(err.message));
-      } else {
-        next(err);
+        return next(new DuplicateError(err.message));
       }
+      return next(err);
     });
 };
 
@@ -97,10 +94,10 @@ module.exports.updateUser = (req, res, next) => {
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
       if (err instanceof UserNotFound) {
-        next(new UserNotFound(err.message));
+        return next(new UserNotFound(err.message));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new ValidationError(err.message));
+        return next(new ValidationError(err.message));
       }
       return next(err);
     });
@@ -115,10 +112,10 @@ module.exports.updateAvatar = (req, res, next) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof UserNotFound) {
-        next(new UserNotFound(err.message));
+        return next(new UserNotFound(err.message));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        next(new ValidationError(err.message));
+        return next(new ValidationError(err.message));
       }
       return next(err);
     });

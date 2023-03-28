@@ -1,5 +1,5 @@
 class UserNotFound extends Error {
-  constructor({ addMessage = '' }) {
+  constructor(addMessage = '') {
     super();
     this.message = `Пользователь не найден ${addMessage}`;
     this.name = 'UserNotFound';

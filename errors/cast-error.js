@@ -1,5 +1,5 @@
 class CastError extends Error {
-  constructor({ addMessage = '' }) {
+  constructor(addMessage = '') {
     super();
     this.message = `Передан некорректный ID ${addMessage}`;
     this.name = 'CastError';

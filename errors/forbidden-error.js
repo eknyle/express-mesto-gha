@@ -1,5 +1,5 @@
 class Forbidden extends Error {
-  constructor({ addMessage = '' }) {
+  constructor(addMessage = '') {
     super();
     this.message = `Доступ запрещен ${addMessage}`;
     this.name = 'Forbidden';

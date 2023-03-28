@@ -1,5 +1,5 @@
 class DuplicateError extends Error {
-  constructor({ addMessage = '' }) {
+  constructor(addMessage = '') {
     super();
     this.message = `Пользователь с такими данными уже существует ${addMessage}`;
     this.name = 'DuplicateError';
