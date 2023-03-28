@@ -6,11 +6,12 @@ const {
 } = require('../controllers/users');
 
 const pattern = /^https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]{1,256}\.[a-zA-Zа-яА-Я]{1,6}#?$/;
+const oidPattern = /^[0-9a-zA-Z]{24}$/;
 
 router.get('/', getAllUsers);
 router.get('/:id', celebrate({
-  body: Joi.object().keys({
-    id: Joi.string().required().hex().length(24),
+  params: Joi.object().keys({
+    id: Joi.string().required().regex(oidPattern),
   }),
 }), getUser);
 router.get('/me', getCurrentUser);
