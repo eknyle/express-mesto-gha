@@ -42,7 +42,7 @@ module.exports.deleteCard = (req, res, next) => {
               return next(new CastError(err.message));
             }
             if (err instanceof CardNotFound) {
-              return next(new CardNotFound(err.message));
+              return next(new CardNotFound());
             }
             return next(err);
           });
@@ -55,7 +55,7 @@ module.exports.deleteCard = (req, res, next) => {
         return next(new CastError(err.message));
       }
       if (err instanceof CardNotFound) {
-        return next(new CardNotFound(err.message));
+        return next(new CardNotFound());
       }
       if (err instanceof ForbiddenError) {
         return next(new ForbiddenError(err.message));
@@ -73,7 +73,7 @@ module.exports.likeCard = (req, res, next) => {
     .orFail(() => {
       throw new CardNotFound();
     })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new CastError(err.message));
@@ -94,7 +94,7 @@ module.exports.dislikeCard = (req, res, next) => {
     .orFail(() => {
       throw new CardNotFound();
     })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new CastError(err.message));

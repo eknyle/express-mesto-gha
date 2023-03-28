@@ -4,6 +4,7 @@ class CardNotFound extends Error {
     this.message = `Карточка не найдена ${addMessage}`;
     this.name = 'CardNotFound';
     this.status = 404;
+    this.statusCode = 404;
   }
 }
 
