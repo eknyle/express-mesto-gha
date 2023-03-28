@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-userSchema.statics.toJSON = function () {
+userSchema.methods.removePassword = function () {
   const obj = this.toObject();
   delete obj.password;
   return obj;
