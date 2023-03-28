@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { celebrate, Joi } = require('celebrate');
 const userRouter = require('./users');
 const cardRouter = require('./cards');
-const PageNotFoundError = require('../errors/page-not-found-error');
+const NotFoundError = require('../errors/not-found-error');
 const auth = require('../middlewares/auth');
 
 const { login, createUser } = require('../controllers/users');
@@ -29,7 +29,7 @@ router.use('/users', auth, userRouter);
 router.use('/cards', auth, cardRouter);
 
 router.use(auth, (req, res, next) => {
-  next(new PageNotFoundError());
+  next(new NotFoundError());
 });
 
 module.exports = router;

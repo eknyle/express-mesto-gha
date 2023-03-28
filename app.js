@@ -6,7 +6,6 @@ const { errors } = require('celebrate');
 const errorHandler = require('./errors/error-handler');
 const routes = require('./routes');
 
-
 const { PORT = 3000 } = process.env;
 const app = express();
 

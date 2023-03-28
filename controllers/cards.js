@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 const ForbiddenError = require('../errors/forbidden-error');
-const CardNotFound = require('../errors/card-not-found-error');
+const NotFoundError = require('../errors/not-found-error');
 const ValidationError = require('../errors/validation-error');
-const CastError = require('../errors/cast-error');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
@@ -19,7 +18,7 @@ module.exports.createCard = (req, res, next) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new ValidationError(err.message));
+        return next(new ValidationError());
       }
       return next(err);
     });
@@ -28,37 +27,30 @@ module.exports.createCard = (req, res, next) => {
 module.exports.deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
     .orFail(() => {
-      throw new CardNotFound();
+      throw new NotFoundError();
     })
     .then((card_) => {
       if (card_.owner._id.toString() === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId)
           .orFail(() => {
-            throw new CardNotFound();
+            throw new NotFoundError();
           })
           .then((card) => res.send({ data: card }))
           .catch((err) => {
             if (err instanceof mongoose.Error.CastError) {
-              return next(new CastError(err.message));
-            }
-            if (err instanceof CardNotFound) {
-              return next(new CardNotFound());
+              return next(new NotFoundError());
             }
             return next(err);
           });
-      } else {
-        return next(new ForbiddenError());
       }
+      return next(new ForbiddenError());
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return next(new CastError(err.message));
-      }
-      if (err instanceof CardNotFound) {
-        return next(new CardNotFound());
+        return next(new NotFoundError());
       }
       if (err instanceof ForbiddenError) {
-        return next(new ForbiddenError(err.message));
+        return next(new ForbiddenError());
       }
       return next(err);
     });
@@ -71,15 +63,12 @@ module.exports.likeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      throw new CardNotFound();
+      throw new NotFoundError();
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return next(new CastError(err.message));
-      }
-      if (err instanceof CardNotFound) {
-        return next(new CardNotFound(err.message));
+        return next(new NotFoundError());
       }
       return next(err);
     });
@@ -92,15 +81,12 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true, runValidators: true },
   )
     .orFail(() => {
-      throw new CardNotFound();
+      throw new NotFoundError();
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return next(new CastError(err.message));
-      }
-      if (err instanceof CardNotFound) {
-        return next(new CardNotFound(err.message));
+        return next(new NotFoundError());
       }
       return next(err);
     });

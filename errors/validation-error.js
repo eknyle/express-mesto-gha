@@ -1,7 +1,7 @@
 class ValidationError extends Error {
-  constructor(addMessage = '') {
+  constructor() {
     super();
-    this.message = `Переданы некорректные данные ${addMessage}`;
+    this.message = 'Переданы некорректные данные';
     this.name = 'ValidationError';
     this.status = 400;
     this.statusCode = 400;

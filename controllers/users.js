@@ -2,11 +2,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const UserNotFound = require('../errors/user-not-found-error');
+const NotFoundError = require('../errors/not-found-error');
 const DuplicateError = require('../errors/duplicate-error');
 const ValidationError = require('../errors/validation-error');
-const UnauthorizedError = require('../errors/unauthorized-error');
-const CastError = require('../errors/cast-error');
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})
@@ -17,17 +15,13 @@ module.exports.getAllUsers = (req, res, next) => {
 module.exports.getUser = (req, res, next) => {
   User.findById(req.params.id)
     .orFail(() => {
-      throw new UserNotFound();
+      throw new NotFoundError();
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return next(new CastError(err.message));
+        return next(new NotFoundError());
       }
-      if (err instanceof UserNotFound) {
-        return next(new UserNotFound(err.message));
-      }
-
       return next(err);
     });
 };
@@ -35,15 +29,12 @@ module.exports.getUser = (req, res, next) => {
 module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .orFail(() => {
-      throw new UserNotFound();
+      throw new NotFoundError();
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return next(new CastError(err.message));
-      }
-      if (err instanceof UserNotFound) {
-        return next(new UserNotFound(err.message));
+        return next(new NotFoundError());
       }
       return next(err);
     });
@@ -58,7 +49,7 @@ module.exports.login = (req, res, next) => {
       // вернём токен
       res.send({ token });
     })
-    .catch((err) => next(new UnauthorizedError(err.message)))
+    .catch((err) => next(err))
     .catch(next);
 };
 
@@ -75,10 +66,10 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => res.send({ data: user.removePassword() }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new ValidationError(err.message));
+        return next(new ValidationError());
       }
       if (err.code === 11000) {
-        return next(new DuplicateError(err.message));
+        return next(new DuplicateError());
       }
       return next(err);
     });
@@ -89,15 +80,12 @@ module.exports.updateUser = (req, res, next) => {
 
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail(() => {
-      throw new UserNotFound();
+      throw new NotFoundError();
     })
     .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err instanceof UserNotFound) {
-        return next(new UserNotFound(err.message));
-      }
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new ValidationError(err.message));
+        return next(new ValidationError());
       }
       return next(err);
     });
@@ -107,15 +95,12 @@ module.exports.updateAvatar = (req, res, next) => {
 
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail(() => {
-      throw new UserNotFound();
+      throw new NotFoundError();
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err instanceof UserNotFound) {
-        return next(new UserNotFound(err.message));
-      }
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new ValidationError(err.message));
+        return next(new ValidationError());
       }
       return next(err);
     });

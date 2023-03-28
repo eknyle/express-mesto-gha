@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const validator = require('validator');
-const UserNotFound = require('../errors/user-not-found-error');
+const UnauthorizedError = require('../errors/unauthorized-error');
 
 const VALIDATION_ERROR_MESSAGE = 'Переданы некорректные данные';
 
@@ -59,17 +59,17 @@ userSchema.methods.removePassword = function () {
 userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .orFail(() => {
-      throw new UserNotFound();
+      throw new UnauthorizedError();
     })
     .then((user) => {
       if (!user) {
-        return Promise.reject(new Error('Неправильные почта или пароль'));
+        return Promise.reject(new UnauthorizedError());
       }
 
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            return Promise.reject(new Error('Неправильные почта или пароль'));
+            return Promise.reject(new UnauthorizedError());
           }
 
           return user; // теперь user доступен

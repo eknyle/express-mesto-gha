@@ -1,7 +1,7 @@
 class Forbidden extends Error {
-  constructor(addMessage = '') {
+  constructor() {
     super();
-    this.message = `Доступ запрещен ${addMessage}`;
+    this.message = 'Доступ запрещен';
     this.name = 'Forbidden';
     this.status = 403;
     this.statusCode = 403;
