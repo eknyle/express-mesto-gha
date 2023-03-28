@@ -10,7 +10,7 @@ const pattern = /^https?\:\/\/(www\.)?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\
 router.get('/', getAllUsers);
 router.get('/:id', celebrate({
   body: Joi.object().keys({
-    id: Joi.string().required().min(24),
+    id: Joi.string().required().hex().length(24),
   }),
 }), getUser);
 router.get('/me', getCurrentUser);
