@@ -37,9 +37,9 @@ module.exports.deleteCard = (req, res, next) => {
           })
           .then((card) => res.send({ data: card }))
           .catch(next);
-        return next();
+      } else {
+        return next(new ForbiddenError());
       }
-      return next(new ForbiddenError());
     })
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
